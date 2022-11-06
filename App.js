@@ -1,20 +1,20 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from "react-native";
+import AuthNavigator from "./frontend/Navigation/AuthNavigator";
+import { NavigationContainer } from "@react-navigation/native";
+import { StatusBar } from "expo-status-bar";
+import Wallet from "./frontend/Screen/WalletScreen";
+import Profile from "./frontend/Screen/ProfileScreen";
+import axios from "axios";
+import NewEmployee from "./frontend/Screen/NewEmployeeScreen";
 
 export default function App() {
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <>
+      <StatusBar style="light" backgroundColor="black" />
+      <NavigationContainer>
+        <AuthNavigator />
+      </NavigationContainer>
+      {/* <NewEmployee /> */}
+    </>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});

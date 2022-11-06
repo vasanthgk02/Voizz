@@ -1,0 +1,3 @@
+#!C:\Users\Sri Vatshan\Desktop\jumma project\sentimental-analysis\sentimental-analysis\env\Scripts\python.exe
+from numba.pycc import main
+main()
