@@ -27,7 +27,7 @@ import renderRightActions from "./RenderRightActions";
 import fileUploadApi from "../Api/fileUploadApi";
 import sendReward from "../Api/sendReward";
 
-const handleSendReward = async (name, email, sigma) => {
+const handleSendReward = async (name, email, sigma, value, audioName) => {
   if (sigma.length == 0) {
     Alert.alert("Voizz says", "Tokens cannot be zero", [
       {
@@ -41,8 +41,15 @@ const handleSendReward = async (name, email, sigma) => {
     name: name,
     email: email,
     reward: parseInt(sigma),
+    result: value,
+    audioName: audioName,
   });
-  console.log(response.data);
+  Alert.alert("Voizz says", "Tokens sent to " + name + " successfully", [
+    {
+      text: "Ok",
+      style: "cancel",
+    },
+  ]);
 };
 
 function Item({ title, description, imageUrl, email }) {
@@ -173,7 +180,11 @@ function Item({ title, description, imageUrl, email }) {
                     value={sigma}
                   />
                   <TouchableOpacity
-                    onPress={() => handleSendReward(title, email, sigma)}
+                    onPress={() => {
+                      handleSendReward(title, email, sigma, value, audioName);
+                      setValue("Upload Audio To View Result");
+                      setSigma(0);
+                    }}
                   >
                     <MaterialCommunityIcons
                       name="send-circle"

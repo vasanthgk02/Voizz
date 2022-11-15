@@ -7,7 +7,7 @@
     "icon": "./frontend/Assets/icon.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./frontend/Assets/splash.png",
+      "image": "./frontend/Assets/sigma.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -20,9 +20,10 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./frontend/Assets/adaptive-icon.png",
+        "foregroundImage": "./frontend/Assets/icon.png",
         "backgroundColor": "#FFFFFF"
-      }
+      },
+      "package": "com.miniproject.voizz"
     },
     "web": {
       "favicon": "./frontend/Assets/favicon.png"

@@ -8,7 +8,7 @@ const ProgressBar = ({ value }) => {
       value={value}
       textColor="#222"
       fontSize={20}
-      title={"efficiency"}
+      title={"efficient"}
       valueSuffix={"%"}
       inActiveStrokeColor={"#2ecc71"}
       inActiveStrokeOpacity={0.2}

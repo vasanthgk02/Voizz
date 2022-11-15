@@ -2,5 +2,6 @@
 2. run .\env\Scripts\activate
 3. run python app.py to run flask server
 use this command 'python .\app.py'
-ENJOY ;
+4. open html file and input the file name
+ENJOY ;P
 

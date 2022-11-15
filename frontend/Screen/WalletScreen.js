@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import {
   FlatList,
   Image,
+  RefreshControl,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -25,13 +26,16 @@ function Wallet({ navigation }) {
   const [sentData, setSentData] = useState([]);
   const [receivedData, setReceivedData] = useState([]);
   const [active, setActive] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   const loadListing = async () => {
+    setLoading(true);
     const response = await walletApi.getWallet();
     const data = response.data[0];
     setSigmaValue(() => data["walletBalance"]);
     setSentData(() => data["sentHistory"]);
     setReceivedData(() => data["receivedHistory"]);
+    setLoading(false);
   };
   useEffect(() => {
     loadListing();
@@ -222,6 +226,9 @@ function Wallet({ navigation }) {
         <FlatList
           data={active ? sentData : receivedData}
           keyExtractor={() => key++}
+          refreshControl={
+            <RefreshControl refreshing={loading} onRefresh={loadListing} />
+          }
           renderItem={(item) => (
             <Item
               name={item["item"]["name"]}

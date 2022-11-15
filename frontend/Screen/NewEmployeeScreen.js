@@ -29,18 +29,20 @@ const validationSchema = Yup.object().shape({
 
 const loadData = async (data) => {
   await newEmployeeApi.putEmployee(data);
+  console.log(data);
   Alert.alert("VOIZZ", "Data uploaded successfully");
 };
 
 function NewEmployee() {
-  const [image, setImage] = useState(false);
+  let [image, setImage] = useState(false);
 
   const fetchImage = async () => {
-    const image = await ImagePicker.launchImageLibraryAsync();
-    return image.cancelled == false ? setImage(image.uri) : "";
+    const imageUrl = await ImagePicker.launchImageLibraryAsync();
+    return imageUrl != false ? setImage(imageUrl["uri"]) : "";
   };
 
   const handleSave = ({ name, email, password }) => {
+    console.log(image);
     const newData = {
       _id: Math.floor(Math.random() * 100) + 1,
       url: image,
@@ -52,6 +54,7 @@ function NewEmployee() {
       description: "New User",
     };
     loadData(newData);
+    setImage(false);
   };
 
   return (
@@ -65,7 +68,6 @@ function NewEmployee() {
             password: values.password,
           });
           resetForm();
-          setTouched({});
         }}
         validationSchema={validationSchema}
       >
@@ -101,12 +103,10 @@ function NewEmployee() {
                 style={{ marginLeft: 10, width: "100%", height: "100%" }}
               ></TextInput>
             </View>
-            {touched.name ? (
+            {touched.name && (
               <Text style={{ color: "red", fontWeight: "bold" }}>
                 {errors.name}
               </Text>
-            ) : (
-              <Text>{""}</Text>
             )}
             <View style={styles.input}>
               <MaterialIcons name="email" size={24} color={Colors.black} />
@@ -150,7 +150,9 @@ function NewEmployee() {
             )}
             <TouchableOpacity
               style={styles.buttonContainer}
-              onPress={handleSubmit}
+              onPress={() => {
+                handleSubmit();
+              }}
             >
               <Entypo name="upload" size={50} color={Colors.black} />
             </TouchableOpacity>

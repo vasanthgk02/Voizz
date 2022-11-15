@@ -67,7 +67,7 @@ def analyze():
         feature = extract_feature(audio_file, mfcc=True, chroma=True, mel=True)
         feature = feature.reshape(1, -1)
         prediction = loaded_model.predict(feature)
-        prediction = prediction[0]
+        prediction = prediction[0]        
         return prediction
 
 @app.route('/org', methods = ['POST', 'GET'])
@@ -124,16 +124,21 @@ def newEmployee():
         data = request.get_json()
         password = data['password']        
         hashed_password = hashlib.sha256(password.encode('utf-8')).hexdigest()
+        print(data)
         empDetails = {'_id': data['_id'], 'url': data['url'], 'name': data['name'], 'email': data['email'], 'password': hashed_password, 'walletBalance': 0, 'audioHistory': [], 'description': 'New User'}        
         emp.insert_one(empDetails)
-        # print(empDetails)
         return "success"
 
 @app.route("/empHist", methods = ["GET"])
 def empWallet():
     if(request.method == "GET"):
-        res = org.find({'receivedHistory':{'$elemMatch':{'email' : empEmail}}});  
-        return list(res)
+        res = (org.find({'sentHistory':{'$elemMatch':{'email' : empEmail}}}, {"sentHistory" : 1}));  
+        res = list(res)[0]['sentHistory']
+        return_res =[]
+        for x in res:
+            if x['email'] == empEmail:
+                return_res.append(x)
+        return return_res
 
 @app.route("/reward", methods = ["POST"])
 def updateReward():
@@ -145,10 +150,13 @@ def updateReward():
         res2 = org.find(myquery2)
         empBal = list(res1)[0]['walletBalance']
         orgBal = list(res2)[0]['walletBalance']
-        newvalue1 = { "$set": { "walletBalance": empBal +  json['reward']} }
+        newvalue1 = { "$set": { "walletBalance": empBal +  json['reward'], "description" : "Last Result : " + json["result"]} }
         newvalue2 = { "$set": { "walletBalance": orgBal -  json['reward']} }
         emp.update_one(myquery1, newvalue1)
-        org.update_one(myquery2, newvalue2)
+        org.update_one(myquery2, newvalue2)        
+        emp.update_one({"email" : json["email"]}, {"$set" : { "description" : "Last Review : " +json["result"]}})
+        org.update_one({},{"$push": { "sentHistory": { "name": json["name"], "email": json["email"], "audioName": json["audioName"], "value": json["reward"] } } })
+        emp.update_one({"name" : json["name"], "email" : json["email"]}, {"$push" : {"audioHistory" : {"result" : json["result"], "audioName" : json["audioName"], "result" : json["result"]}}})
         return "success"
 
 if __name__ == '__main__':

@@ -15,6 +15,7 @@ import ActivityIndicator from "../Components/ActivityIndicator";
 import { MaterialIcons } from "@expo/vector-icons";
 import ProgressBar from "../Components/ProgressBar";
 import { Fontisto } from "@expo/vector-icons";
+import employeeApi from "../Api/employeeApi";
 
 const Item = ({ title, result }) => (
   <>
@@ -45,33 +46,24 @@ const wait = (timeout) => {
 
 const point = (result) => {
   switch (result) {
-    case "ps":
-      percentage += 8;
-      return;
-    case "happy":
-      percentage += 7;
-      return;
-    case "calm":
-      percentage += 6;
-      return;
-    case "neutral":
-      percentage += 5;
-      return;
-    case "sad":
-      percentage += 4;
-      return;
-    case "fear":
-      percentage += 3;
-      return;
-    case "disgust":
-      percentage += 2;
-      return;
-    case "angry":
-      percentage += 1;
-      return;
+    case "Ps":
+      return 8;
+    case "Happy":
+      return 7;
+    case "Calm":
+      return 6;
+    case "Neutral":
+      return 5;
+    case "Sad":
+      return 4;
+    case "Fear":
+      return 3;
+    case "Disgust":
+      return 2;
+    case "Angry":
+      return 1;
     default:
-      percentage += 0;
-      return;
+      return 0;
   }
 };
 
@@ -107,12 +99,17 @@ function Profile({ navigation }) {
     setImageUrl(data["url"]);
     setName(data["name"]);
     setDATA(data["audioHistory"]);
-    let percentage = 0;
-    for (var i = 0; i < DATA.length; i++) {
-      percentage += point(DATA[i]["result"]);
-    }
-    setValue((percentage / (8 * DATA.length)) * 100);
-    wait(2000).then(() => setLoading(false));
+
+    wait(2000).then(() => {
+      let percentage = 0;
+      for (var i = 0; i < DATA.length; i++) {
+        percentage += point(DATA[i]["result"]);
+      }
+      setValue(() => {
+        return DATA.length != 0 ? (percentage / (8 * DATA.length)) * 100 : 0;
+      });
+      setLoading(false);
+    });
   };
 
   useEffect(() => {
@@ -131,47 +128,56 @@ function Profile({ navigation }) {
           />
         </View>
       ) : (
-        <View
-          style={{
-            backgroundColor: Colors.secondary,
-          }}
-        >
+        <>
           <View
             style={{
-              height: "30%",
-              justifyContent: "center",
-              alignItems: "center",
-              marginTop: "10%",
+              backgroundColor: Colors.secondary,
+              height: "50%",
             }}
           >
-            <ProgressBar value={value} />
-          </View>
-          <View
-            style={{
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <View style={[styles.container, { justifyContent: "center" }]}>
-              {imageUrl && (
-                <Image style={styles.image} source={{ uri: imageUrl }}></Image>
-              )}
-              {!imageUrl && (
-                <View
-                  style={[
-                    styles.image,
-                    { justifyContent: "center", alignItems: "center" },
-                  ]}
-                >
-                  <Fontisto name="camera" size={40} color={Colors.black} />
+            <View
+              style={{
+                justifyContent: "center",
+                alignItems: "center",
+                marginTop: "15%",
+              }}
+            >
+              <ProgressBar value={value} />
+            </View>
+            <View
+              style={{
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <View
+                style={[
+                  styles.container,
+                  { justifyContent: "center", marginTop: "5%" },
+                ]}
+              >
+                {imageUrl && (
+                  <Image
+                    style={styles.image}
+                    source={{ uri: imageUrl }}
+                  ></Image>
+                )}
+                {!imageUrl && (
+                  <View
+                    style={[
+                      styles.image,
+                      { justifyContent: "center", alignItems: "center" },
+                    ]}
+                  >
+                    <Fontisto name="camera" size={40} color={Colors.black} />
+                  </View>
+                )}
+                <View style={styles.descriptor}>
+                  <Text style={styles.name}>{name}</Text>
                 </View>
-              )}
-              <View style={styles.descriptor}>
-                <Text style={styles.name}>{name}</Text>
               </View>
             </View>
           </View>
-
           <Text style={styles.heading}>Audio files history : </Text>
           <FlatList
             data={DATA}
@@ -186,7 +192,7 @@ function Profile({ navigation }) {
               ></Item>
             )}
           />
-        </View>
+        </>
       )}
     </>
   );

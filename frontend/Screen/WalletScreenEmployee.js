@@ -28,8 +28,8 @@ function EmployeeWallet() {
   const loadData = async () => {
     const response1 = await employeeDetailsApi.getDetails();
     const response2 = await employeeApi.getHist();
-    setDATA(response2.data[0]["receivedHistory"]);
     setSigmaValue(response1.data[0]["walletBalance"]);
+    setDATA(response2.data);
   };
 
   useEffect(() => {
