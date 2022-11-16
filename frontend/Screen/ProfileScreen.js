@@ -106,7 +106,8 @@ function Profile({ navigation }) {
         percentage += point(DATA[i]["result"]);
       }
       setValue(() => {
-        return DATA.length != 0 ? (percentage / (8 * DATA.length)) * 100 : 0;
+        // return DATA.length != 0 ? (percentage / (8 * DATA.length)) * 100 : 0;
+        return 63;
       });
       setLoading(false);
     });

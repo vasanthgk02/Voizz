@@ -85,6 +85,7 @@ function EmployeeListing({ navigation }) {
                     title={item["name"]}
                     description={item["description"]}
                     email={item["email"]}
+                    phoneNo={item["phoneNo"]}
                   />
                 )}
               />

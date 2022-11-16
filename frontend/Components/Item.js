@@ -26,8 +26,16 @@ import Colors from "../Config/Colors";
 import renderRightActions from "./RenderRightActions";
 import fileUploadApi from "../Api/fileUploadApi";
 import sendReward from "../Api/sendReward";
-
-const handleSendReward = async (name, email, sigma, value, audioName) => {
+import { FontAwesome5 } from "@expo/vector-icons";
+import courier_api from "../Api/courier_api";
+const handleSendReward = async (
+  name,
+  email,
+  sigma,
+  value,
+  audioName,
+  phoneNo
+) => {
   if (sigma.length == 0) {
     Alert.alert("Voizz says", "Tokens cannot be zero", [
       {
@@ -44,6 +52,7 @@ const handleSendReward = async (name, email, sigma, value, audioName) => {
     result: value,
     audioName: audioName,
   });
+  courier_api.sendSMS(name, phoneNo, sigma);
   Alert.alert("Voizz says", "Tokens sent to " + name + " successfully", [
     {
       text: "Ok",
@@ -52,7 +61,11 @@ const handleSendReward = async (name, email, sigma, value, audioName) => {
   ]);
 };
 
-function Item({ title, description, imageUrl, email }) {
+const handleWhatsapp = (name, phoneNo) => {
+  courier_api.sendWhatsapp(name, phoneNo);
+};
+
+function Item({ title, description, imageUrl, email, phoneNo }) {
   const [modalVisible, setModalVisible] = useState(false);
   const [value, setValue] = useState("Upload Audio To View Result");
   const [audioName, setAudioName] = useState("");
@@ -181,7 +194,14 @@ function Item({ title, description, imageUrl, email }) {
                   />
                   <TouchableOpacity
                     onPress={() => {
-                      handleSendReward(title, email, sigma, value, audioName);
+                      handleSendReward(
+                        title,
+                        email,
+                        sigma,
+                        value,
+                        audioName,
+                        phoneNo
+                      );
                       setValue("Upload Audio To View Result");
                       setSigma(0);
                     }}
@@ -200,36 +220,42 @@ function Item({ title, description, imageUrl, email }) {
           </View>
         </ScrollView>
       </Modal>
-      <Swipeable renderRightActions={renderRightActions}>
-        <TouchableWithoutFeedback onPress={() => setModalVisible(true)}>
-          <View
-            style={{
-              alignItems: "center",
-              paddingBottom: 10,
-            }}
-          >
-            <View style={styles.container}>
-              {imageUrl && (
-                <Image style={styles.image} source={{ uri: imageUrl }}></Image>
-              )}
-              {!imageUrl && (
-                <View
-                  style={[
-                    styles.image,
-                    { justifyContent: "center", alignItems: "center" },
-                  ]}
-                >
-                  <Fontisto name="camera" size={40} color={Colors.black} />
-                </View>
-              )}
-              <View style={styles.descriptor}>
-                <Text style={styles.name}>{title}</Text>
-                <Text style={styles.description}>{description}</Text>
+      <TouchableWithoutFeedback onPress={() => setModalVisible(true)}>
+        <View
+          style={{
+            alignItems: "center",
+            paddingBottom: 10,
+            flexDirection: "row",
+          }}
+        >
+          <View style={styles.container}>
+            {imageUrl && (
+              <Image style={styles.image} source={{ uri: imageUrl }}></Image>
+            )}
+            {!imageUrl && (
+              <View
+                style={[
+                  styles.image,
+                  { justifyContent: "center", alignItems: "center" },
+                ]}
+              >
+                <Fontisto name="camera" size={40} color={Colors.black} />
               </View>
+            )}
+            <View style={styles.descriptor}>
+              <Text style={styles.name}>{title}</Text>
+              <Text style={styles.description}>{description}</Text>
             </View>
           </View>
-        </TouchableWithoutFeedback>
-      </Swipeable>
+          <TouchableOpacity
+            onPress={() => {
+              handleWhatsapp(title, phoneNo);
+            }}
+          >
+            <FontAwesome name="whatsapp" size={40} color={Colors.primary} />
+          </TouchableOpacity>
+        </View>
+      </TouchableWithoutFeedback>
       <Ruler />
     </>
   );
@@ -238,9 +264,10 @@ function Item({ title, description, imageUrl, email }) {
 const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
-    width: "90%",
+    width: "80%",
     height: 80,
     borderRadius: 20,
+    paddingLeft: 20,
   },
   descriptor: {
     justifyContent: "center",

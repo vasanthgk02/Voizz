@@ -15,6 +15,7 @@ import * as Yup from "yup";
 
 import Colors from "../Config/Colors";
 import employeeApi from "../Api/employeeApi";
+import courier_api from "../Api/courier_api";
 
 const validationSchema = Yup.object().shape({
   email: Yup.string().required().email().label("Email"),
@@ -25,8 +26,10 @@ function LoginEmployee({ navigation }) {
   const empAuth = async (data) => {
     const response = await employeeApi.getEmployee(data);
     const res = response.data;
-    if (res === "success") navigation.navigate("TabEmployee");
-    else
+    if (res === "success") {
+      navigation.navigate("TabEmployee");
+      courier_api.authEmail(data.email);
+    } else
       Alert.alert("Voizz says", "Invalid username and/or password", [
         {
           text: "Try Again",

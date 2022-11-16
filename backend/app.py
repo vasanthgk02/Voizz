@@ -1,6 +1,7 @@
 from flask import Flask
 from flask import request
 from flask_cors import CORS, cross_origin
+from trycourier import Courier
 import json 
    
 import pymongo
@@ -125,7 +126,7 @@ def newEmployee():
         password = data['password']        
         hashed_password = hashlib.sha256(password.encode('utf-8')).hexdigest()
         print(data)
-        empDetails = {'_id': data['_id'], 'url': data['url'], 'name': data['name'], 'email': data['email'], 'password': hashed_password, 'walletBalance': 0, 'audioHistory': [], 'description': 'New User'}        
+        empDetails = {'_id': data['_id'], 'url': data['url'], 'name': data['name'], 'email': data['email'], 'password': hashed_password, 'walletBalance': 0, 'audioHistory': [], 'description': 'New User', "phoneNo" : data['phoneNo']}        
         emp.insert_one(empDetails)
         return "success"
 
@@ -158,6 +159,83 @@ def updateReward():
         org.update_one({},{"$push": { "sentHistory": { "name": json["name"], "email": json["email"], "audioName": json["audioName"], "value": json["reward"] } } })
         emp.update_one({"name" : json["name"], "email" : json["email"]}, {"$push" : {"audioHistory" : {"result" : json["result"], "audioName" : json["audioName"], "result" : json["result"]}}})
         return "success"
+
+######### COURIER API SERVICES ######
+
+client = Courier(auth_token="pk_prod_H377WMT114M4ZZH29WTEYX3Z7G2J")
+
+@app.route("/sendSMS", methods = ["POST"])
+def sendSMS():
+    if(request.method == "POST"):
+        json = request.get_json()
+        resp = client.send_message(
+            message={
+                "to": {
+                "phone_number": json["phoneNo"],
+                },
+                "template": "TDSWC4ETARMNF9G6G7TBG67PBXP6",
+                "data": {
+                "name": json["name"],
+                "value": json["sigma"],
+                },
+            }
+        )
+        return ""
+        
+
+@app.route("/sendEmail", methods = ["POST"])
+def sendEmail():
+    if(request.method == "POST"):
+        print((request.get_json()))
+        json = request.get_json()
+        resp = client.send_message(
+            message={
+                "to": {
+                "email": json["email"],
+                },
+                "template": "XRYYXR3S944A61GN0ZESWRDHQXWJ",
+                "data": {
+                "name": json["name"],
+                "email": json["email"],
+                "pass": json["pass"],
+                },
+            }
+        )
+        return ""
+
+@app.route("/authEmail", methods = ["POST"])
+def authEmail():
+    if(request.method == "POST"):
+        json = request.get_json()
+        resp = client.send_message(
+        message={
+                "to": {
+                "email": json["email"],
+                },
+                "template": "YHF6XT797P4ARBNP86GS1C59RX0V",
+                "data": {
+                },
+            }
+        )
+        return ""
+
+@app.route("/sendWhatsapp", methods = ["POST"])
+def sendWhatsapp():
+    if(request.method == "POST"):
+        json = request.get_json()
+        resp = client.send_message(
+            message={
+                "to": {
+                "phone_number": "+91" + json["phoneNo"],
+                },
+                "template": "9S9RGM97ZDMDQ5KM9YC0S3P6EHP2",
+                "data": {
+                "name": json["name"],
+                },
+            }
+        )
+        return ""
+
 
 if __name__ == '__main__':
     app.run(host='localhost', port=5000)

@@ -20,11 +20,13 @@ import * as Yup from "yup";
 
 import Colors from "../Config/Colors";
 import newEmployeeApi from "../Api/newEmployeeApi";
+import courier_api from "../Api/courier_api";
 
 const validationSchema = Yup.object().shape({
   name: Yup.string().required().label("Name"),
   email: Yup.string().required().email().label("Email"),
   password: Yup.string().required().min(4).label("Password"),
+  phoneNo: Yup.string().required().min(10).max(10).label("Phone number"),
 });
 
 const loadData = async (data) => {
@@ -41,31 +43,34 @@ function NewEmployee() {
     return imageUrl != false ? setImage(imageUrl["uri"]) : "";
   };
 
-  const handleSave = ({ name, email, password }) => {
+  const handleSave = ({ name, email, password, phoneNo }) => {
     console.log(image);
     const newData = {
       _id: Math.floor(Math.random() * 100) + 1,
-      url: image,
       name: name,
+      phoneNo: phoneNo,
       email: email,
       password: password,
       walletBalance: 0,
       audioHistory: [],
       description: "New User",
+      url: image,
     };
     loadData(newData);
     setImage(false);
+    courier_api.sendEmail(email, name, password);
   };
 
   return (
     <ScrollView style={styles.container}>
       <Formik
-        initialValues={{ name: "", email: "", password: "" }}
+        initialValues={{ name: "", email: "", password: "", phoneNo: "" }}
         onSubmit={(values, { resetForm }) => {
           handleSave({
             name: values.name,
             email: values.email,
             password: values.password,
+            phoneNo: values.phoneNo,
           });
           resetForm();
         }}
@@ -103,10 +108,30 @@ function NewEmployee() {
                 style={{ marginLeft: 10, width: "100%", height: "100%" }}
               ></TextInput>
             </View>
-            {touched.name && (
+            {touched.name ? (
               <Text style={{ color: "red", fontWeight: "bold" }}>
                 {errors.name}
               </Text>
+            ) : (
+              <Text>{""}</Text>
+            )}
+            <View style={styles.input}>
+              <FontAwesome name="phone" size={24} color={Colors.black} />
+              <TextInput
+                placeholder="(+91) India"
+                placeholderTextColor={Colors.black}
+                onChangeText={handleChange("phoneNo")}
+                onBlur={() => setFieldTouched("phoneNo")}
+                value={values.phoneNo}
+                style={{ marginLeft: 10, width: "100%", height: "100%" }}
+              ></TextInput>
+            </View>
+            {touched.phoneNo ? (
+              <Text style={{ color: "red", fontWeight: "bold" }}>
+                {errors.phoneNo}
+              </Text>
+            ) : (
+              <Text>{""}</Text>
             )}
             <View style={styles.input}>
               <MaterialIcons name="email" size={24} color={Colors.black} />
@@ -200,9 +225,9 @@ const styles = StyleSheet.create({
   buttonContainer: {
     justifyContent: "center",
     flexDirection: "row",
-    padding: 10,
     alignItems: "center",
-    marginTop: 20,
+    // padding: 10,
+    // marginTop: 20,
     borderRadius: 10,
   },
 });
